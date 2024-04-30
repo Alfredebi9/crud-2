@@ -16,9 +16,15 @@
   <a href="/register">Register</a>
 </body>
 <script>
-  // for getting username of user
-  const username = document.cookie.split('; ').find(row => row.startsWith('username=')).split('=')[1];
-  document.getElementById('username-placeholder').innerText = username;
+  // Check if the 'username' cookie exists
+  const usernameCookie = document.cookie.split('; ').find(row => row.startsWith('username='));
+  
+  if (usernameCookie) {
+    const username = usernameCookie.split('=')[1];
+    document.getElementById('username-placeholder').innerText = username;
+  } else {
+    document.getElementById('username-placeholder').innerText = 'Guest';
+  }
 
   function logout() {
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
