@@ -28,9 +28,9 @@ db.once('open', () => console.log('Connected to MongoDB Atlas'));
 
 // Define user schema and model
 const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String
+    username: String,
+    email: String,
+    password: String
 });
 
 
@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
         res.res.redirect('/login');
       } else {
         // Token is valid, serve home page or redirect to another page
-        res.redirect("/");
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
       }
     });
   } else {
@@ -72,90 +72,66 @@ app.get('/', (req, res) => {
 // Routes
 app.post('/register', async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    // Check if the email is already registered
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).send('Email already exists');
-    }
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Create a new user instance
-    const newUser = new User({ username, email, password: hashedPassword });
-    // Save the user to the database
-    await newUser.save();
-    res.redirect('/login')
+      const { username, email, password } = req.body;
+      // Check if the email is already registered
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+          return res.status(400).send('Email already exists');
+      }
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      // Create a new user instance
+      const newUser = new User({ username, email, password: hashedPassword });
+      // Save the user to the database
+      await newUser.save();
+      res.redirect('/login')
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error registering user');
+      console.error(error);
+      res.status(500).send('Error registering user');
   }
 });
 
 
 app.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user) {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (isPasswordValid) {
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
-        // Set the token in the cookie
-        res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
-        // Send success status
-        res.sendStatus(200);
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
+      if (user) {
+          const isPasswordValid = await bcrypt.compare(password, user.password);
+          if (isPasswordValid) {
+              const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+              // Send the token back to the client
+              res.cookie('token', token, { httpOnly: true }).redirect('/');
+          } else {
+              res.status(401).send('Invalid email or password');
+          }
       } else {
-        res.status(401).send('Invalid email or password');
+          res.status(401).send('Invalid email or password');
       }
-    } else {
-      res.status(401).send('Invalid email or password');
-    }
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error logging in');
+      console.error(error);
+      res.status(500).send('Error logging in');
   }
 });
-
 
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) return res.status(401).send('Unauthorized');
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).send('Forbidden');
-    req.user = user;
-    next();
-  });
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.status(401).send('Unauthorized');
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).send('Forbidden');
+        req.user = user;
+        next();
+    });
 };
-// Route to fetch user information
-app.get('/user', authenticateToken, async (req, res) => {
-  try {
-    // Extract user ID from the authenticated token
-    const userId = req.user.userId;
-    // Find user by ID in the database
-    const user = await User.findById(userId);
-    if (user) {
-      // Send user information as JSON response
-      res.json({ username: user.username });
-    } else {
-      // User not found
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error) {
-    console.error('Error fetching user information:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
 
 app.get('/protected', authenticateToken, (req, res) => {
-  res.send('You are authorized');
+    res.send('You are authorized');
 });
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

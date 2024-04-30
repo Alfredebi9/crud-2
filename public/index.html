@@ -1,54 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homepage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
 </head>
-
 <body>
-  <h1>Welcome to Our Website</h1>
-  <!-- Display username if user information is available -->
-  <p id="welcomeMessage"></p>
-  <!-- Your homepage content here -->
-  <button id="logoutBtn">Logout</button>
-  <a href="/login">Login</a>
-  <a href="/register">Register</a>
-
-  <script>
-    // Function to fetch user information and display welcome message
-    async function fetchUserAndDisplayWelcome() {
-      try {
-        const response = await fetch('/user');
-        if (response.ok) {
-          const user = await response.json();
-          if (user && user.username) {
-            document.getElementById('welcomeMessage').innerText = `Welcome, ${user.username}!`;
-          }
-        } else if (response.status === 401) {
-          // Handle unauthorized access (e.g., redirect to login page)
-          window.location.href = "/login";
-        } else {
-          // Handle other error cases
-          console.error('Error fetching user information:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error fetching user information:', error);
-      }
-    }
-
-    // Call the function when the page is loaded
-    window.addEventListener('DOMContentLoaded', fetchUserAndDisplayWelcome);
-
-    // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-      // Clear the token by setting an expired date
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      // Redirect to the login page
-      window.location.href = "/login";
-    });
-  </script>
+    <h1>Welcome to Our Website</h1>
+    <!-- Your homepage content here -->
+    <button>logout</button>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
 </body>
-
 </html>
