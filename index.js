@@ -8,7 +8,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Connect to MongoDB Atlas
-mongoose.connect(MONGODB_URI);
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => console.log("Connected to MongoDB Atlas"));
@@ -32,44 +32,9 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-// Serve registration page
-app.get("/register", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "register.html"));
-});
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve login page
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "login.html"));
-});
-
-// Add a new route for logging out
-app.get("/logout", (req, res) => {
-  res.clearCookie("token");
-  res.clearCookie("username");
-  res.redirect("/login");
-});
-
-// Serve home page or login page based on authentication status
-app.get("/", (req, res) => {
-  const token = req.cookies.token;
-  const username = req.cookies.username;
-  if (token && username) {
-    jwt.verify(token, JWT_SECRET, async (err, decoded) => {
-      if (err) {
-        // Token is invalid or expired, clear cookies and redirect to login page
-        res.clearCookie("token");
-        res.clearCookie("username");
-        res.redirect("/login");
-      } else {
-        // Token is valid, find the user and serve the home page with the username
-        res.sendFile(path.join(__dirname, "public", "index.html"));
-      }
-    });
-  } else {
-    // No token or username found, serve login page
-    res.redirect("/login");
-  }
-});
 
 // Routes
 app.post("/register", async (req, res) => {
@@ -118,6 +83,47 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// Serve registration page
+app.get("/register", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "register.html"));
+});
+
+// Serve login page
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+// Add a new route for logging out
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.clearCookie("username");
+  res.redirect("/login");
+});
+
+// Serve home page or login page based on authentication status
+app.get("/", (req, res) => {
+  const token = req.cookies.token;
+  const username = req.cookies.username;
+  if (token && username) {
+    jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+      if (err) {
+        // Token is invalid or expired, clear cookies and redirect to login page
+        res.clearCookie("token");
+        res.clearCookie("username");
+        res.redirect("/login");
+      } else {
+        // Token is valid, find the user and serve the home page with the username
+        res.sendFile(path.join(__dirname, "public", "index.html"));
+      }
+    });
+  } else {
+    // No token or username found, serve login page
+    res.redirect("/login");
+  }
+});
+
+
+
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -135,6 +141,4 @@ app.get("/protected", authenticateToken, (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+module.exports = app
