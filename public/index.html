@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homepage</title>
 </head>
+
 <body>
-    <h1>Welcome to Our Website</h1>
-    <!-- Your homepage content here -->
-    <button>logout</button>
-    <a href="/login">Login</a>
-    <a href="/register">Register</a>
+  <h1>Welcome to Our Website</h1>
+  <h1>Welcome, <span id="username-placeholder"></span></h1>
+  <!-- Your homepage content here -->
+  <button onclick="logout()">Log Out</button>
+  <a href="/login">Login</a>
+  <a href="/register">Register</a>
 </body>
+<script>
+  // for getting username of user
+  const username = document.cookie.split('; ').find(row => row.startsWith('username=')).split('=')[1];
+  document.getElementById('username-placeholder').innerText = username;
+
+  function logout() {
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    window.location.href = '/logout';
+  }
+</script>
+
 </html>

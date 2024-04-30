@@ -19,5 +19,22 @@
     </form>
     <!-- Link to login page -->
     <p>Already have an account? <a href="/login">Login</a></p>
+
+    <script>
+        const registrationForm = document.getElementById('registrationForm');
+        const emailInput = document.getElementById('email');
+
+        registrationForm.addEventListener('submit', (event) => {
+            if (!validateEmail(emailInput.value)) {
+                event.preventDefault();
+                alert('Please enter a valid email address.');
+            }
+        });
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    </script>
 </body>
 </html>
