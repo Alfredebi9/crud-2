@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Routes
-app.post("/register", async (req, res) => {
+app.post("https://crud-2-topaz.vercel.app/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
     
@@ -59,7 +59,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("https://crud-2-topaz.vercel.app/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -84,13 +84,13 @@ app.post("/login", async (req, res) => {
 });
 
 // Serve registration page
-app.get("/register", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "register.html"));
+app.get("https://crud-2-topaz.vercel.app/register", (req, res) => {
+  res.sendFile(path.join(__dirname, "register.html"));
 });
 
 // Serve login page
 app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "login.html"));
+  res.sendFile(path.join(__dirname, "login.html"));
 });
 
 // Add a new route for logging out
