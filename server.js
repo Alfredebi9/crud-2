@@ -66,6 +66,7 @@ app.post("/login", async (req, res) => {
         // Send the token back to the client
         res.cookie("token", token, { httpOnly: true });
         res.cookie("username", user.username);
+        
          // Log the cookies before redirection
          console.log("Token cookie:", token);
          console.log("Username cookie:", user.username);
