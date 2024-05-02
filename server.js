@@ -48,7 +48,7 @@ app.post("/register", async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
     // Save the user to the database
     await newUser.save();
-    res.redirect("https://crud-2-topaz.vercel.app/login") || res.redirect("/login");
+    res.redirect("/login");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error registering user");
@@ -66,7 +66,7 @@ app.post("/login", async (req, res) => {
         // Send the token back to the client
         res.cookie("token", token, { httpOnly: true });
         res.cookie("username", user.username);
-        res.redirect("https://crud-2-topaz.vercel.app/") || res.redirect("/");
+        res.redirect("/");
       } else {
         res.status(401).send("Invalid email or password");
       }
@@ -81,19 +81,19 @@ app.post("/login", async (req, res) => {
 
 // Serve registration page
 app.get("/register", (req, res) => {
-  res.redirect("https://crud-2-topaz.vercel.app/register") || res.sendFile(path.join(__dirname, "public", "register.html"));
+  res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
 // Serve login page
 app.get("/login", (req, res) => {
-  res.redirect("https://crud-2-topaz.vercel.app/login") || res.sendFile(path.join(__dirname, "public", "login.html"));
+  res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 
 // Add a new route for logging out
 app.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.clearCookie("username");
-  res.redirect("https://crud-2-topaz.vercel.app/login") || res.redirect("/login");
+  res.redirect("/login");
 });
 
 // Serve home page or login page based on authentication status
@@ -106,15 +106,15 @@ app.get("/", (req, res) => {
         // Token is invalid or expired, clear cookies and redirect to login page
         res.clearCookie("token");
         res.clearCookie("username");
-        res.redirect("https://crud-2-topaz.vercel.app/login") || res.redirect("/login");
+        res.redirect("/login");
       } else {
         // Token is valid, find the user and serve the home page with the username
-        res.redirect("https://crud-2-topaz.vercel.app/") || res.sendFile(path.join(__dirname, "public", "index.html"));
+        res.sendFile(path.join(__dirname, "public", "index.html"));
       }
     });
   } else {
     // No token or username found, serve login page
-    res.redirect("https://crud-2-topaz.vercel.app/login") || res.redirect("/login");
+    res.redirect("/login");
   }
 });
 
