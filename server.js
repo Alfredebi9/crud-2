@@ -8,7 +8,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 
 const app = express();
-// const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Connect to MongoDB Atlas
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(MONGODB_URI);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => console.log("Connected to MongoDB Atlas"));
@@ -32,12 +32,8 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-
 // Routes
-app.post("https://crud-2-topaz.vercel.app/register", async (req, res) => {
+app.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
     
@@ -59,7 +55,7 @@ app.post("https://crud-2-topaz.vercel.app/register", async (req, res) => {
   }
 });
 
-app.post("https://crud-2-topaz.vercel.app/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -84,13 +80,13 @@ app.post("https://crud-2-topaz.vercel.app/login", async (req, res) => {
 });
 
 // Serve registration page
-app.get("https://crud-2-topaz.vercel.app/register", (req, res) => {
-  res.sendFile(path.join(__dirname, "register.html"));
+app.get("/register", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
 // Serve login page
 app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "login.html"));
+  res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 
 // Add a new route for logging out
@@ -141,4 +137,7 @@ app.get("/protected", authenticateToken, (req, res) => {
 });
 
 // Start the server
-module.exports = app
+// module.exports = app
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
