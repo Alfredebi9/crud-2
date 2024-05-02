@@ -48,7 +48,7 @@ app.post("/register", async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
     // Save the user to the database
     await newUser.save();
-    res.redirect("/login");
+    res.redirect("https://crud-2-topaz.vercel.app/login");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error registering user");
@@ -66,7 +66,7 @@ app.post("/login", async (req, res) => {
         // Send the token back to the client
         res.cookie("token", token, { httpOnly: true });
         res.cookie("username", user.username);
-        res.redirect("/");
+        res.redirect("https://crud-2-topaz.vercel.app/");
       } else {
         res.status(401).send("Invalid email or password");
       }
