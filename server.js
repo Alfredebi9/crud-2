@@ -115,7 +115,7 @@ app.get("/", (req, res) => {
         res.redirect("https://crud-2-topaz.vercel.app/login");
       } else {
         // Token is valid, find the user and serve the home page with the username
-        res.sendFile(path.join(__dirname, "public", "index.html"));
+        res.redirect("https://crud-2-topaz.vercel.app/")
       }
     });
   } else {
