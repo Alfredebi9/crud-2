@@ -37,33 +37,20 @@ db.once("open", () => console.log("Connected to MongoDB Atlas"));
 
 // Define user schema and model
 const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  verified:{
-    type: Boolean,
-    default: false,
-    }
+  username: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  verified: { type: Boolean, default: false }
 });
 const User = mongoose.model('User', userSchema);
 
+
 // Routes
 
-
+// Registration
 app.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    
     // Check if the email is already registered
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -75,7 +62,6 @@ app.post("/register", async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
     // Save the user to the database
     await newUser.save();
-    
     // send verification email
     const mailOptions = {
       from: "alfredsalvadorfav@gmail.com",
@@ -83,7 +69,7 @@ app.post("/register", async (req, res) => {
       subject: 'Email Verification',
       text: 'Click the link to verify your email: https://crud-2-vysm.vercel.app/verify/' + newUser._id
     };
-    transporter.sendMail(mailOptions, function(error, info){
+    transporter.sendMail(mailOptions, (error, info)=>{
       if (error) {
         console.log(error);
       } else {
@@ -97,7 +83,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-
+// Email verification
 app.get("/verify/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -111,15 +97,14 @@ app.get("/verify/:userId", async (req, res) => {
     await user.save();
     
     // After setting verification to true, redirect to the login page
-    res.redirect("https://crud-2-vysm.vercel.app/login");
+    res.redirect("/login");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error verifying email");
   }
 });
 
-
-
+// login
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
