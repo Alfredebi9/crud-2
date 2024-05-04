@@ -78,6 +78,7 @@ app.post("/register", async (req, res) => {
         console.log(error);
       } else {
         console.log('Email sent: ' + info.response);
+        res.send(`Email sent: ${info.response, process.env.EMAIL_USER}`)
       }
     });
     res.redirect("/login");
