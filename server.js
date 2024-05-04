@@ -6,11 +6,23 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
+
+
+// Configure nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service:'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,14 +37,29 @@ db.once("open", () => console.log("Connected to MongoDB Atlas"));
 
 // Define user schema and model
 const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
+  username: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  verified:{
+    type: Boolean,
+    default: false,
+    }
 });
-
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 
 // Routes
+
+
 app.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -48,18 +75,59 @@ app.post("/register", async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
     // Save the user to the database
     await newUser.save();
-    res.redirect("/login");
+    
+    // send verification email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Email Verification',
+      text: 'Click the link to verify your email: crud-2-vysm.vercel.app/verify/' + newUser._id
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+    res.send("email verification sent");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error registering user");
   }
 });
 
+
+app.get("/verify/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    // Find the user by userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    // Set the user's verified status to true
+    user.verified = true;
+    await user.save();
+    
+    // After setting verification to true, redirect to the login page
+    res.redirect("/login");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error verifying email");
+  }
+});
+
+
+
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user) {
+      if (!user.verified) {
+        return res.status(401).send("Email not verified. Please verify your email before logging in.");
+      }
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
         const token = jwt.sign({ userId: user._id }, JWT_SECRET);
