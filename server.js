@@ -67,7 +67,7 @@ app.post("/register", async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Email Verification',
-      html: '<h1>Welcome to CRUD</h1> Click the link to verify your email <br> https://crud-2-livid.vercel.app/verify/' + newUser._id
+      html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-2-livid.vercel.app/verify/' + newUser._id
     };
     transporter.sendMail(mailOptions, (error, info)=>{
       if (error) {
