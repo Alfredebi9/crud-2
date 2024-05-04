@@ -81,7 +81,7 @@ app.post("/register", async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Email Verification',
-      text: 'Click the link to verify your email: crud-2-vysm.vercel.app/verify/' + newUser._id
+      text: 'Click the link to verify your email: https://crud-2-vysm.vercel.app/verify/' + newUser._id
     };
     transporter.sendMail(mailOptions, function(error, info){
       if (error) {
@@ -90,7 +90,7 @@ app.post("/register", async (req, res) => {
         console.log('Email sent: ' + info.response);
       }
     });
-    res.send("email verification sent");
+    res.redirect("/login");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error registering user");
@@ -111,7 +111,7 @@ app.get("/verify/:userId", async (req, res) => {
     await user.save();
     
     // After setting verification to true, redirect to the login page
-    res.redirect("/login");
+    res.redirect("https://crud-2-vysm.vercel.app/login");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error verifying email");
