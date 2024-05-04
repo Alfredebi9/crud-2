@@ -15,13 +15,17 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 
 // Configure nodemailer transporter
+// Configure nodemailer transporter for Zoho Mail
 const transporter = nodemailer.createTransport({
-  service:'gmail',
+  host: 'smtp.zoho.com',
+  port: 465, // Use port 465 for secure SSL connection
+  secure: true, // true for 465, false for other ports
   auth: {
-    user:process.env.EMAIL_USER,
-    pass:process.env.EMAIL_PASSWORD
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
   }
 });
+
 
 
 // Middleware
