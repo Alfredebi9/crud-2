@@ -15,7 +15,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 
 // Configure nodemailer transporter
-// Configure nodemailer transporter for Zoho Mail
 const transporter = nodemailer.createTransport({
   host: 'smtp.zoho.com',
   port: 465, // Use port 465 for secure SSL connection
@@ -73,13 +72,21 @@ app.post("/register", async (req, res) => {
       subject: 'Email Verification',
       html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-auth-blush.vercel.app/verify/' + newUser._id
     };
-    transporter.sendMail(mailOptions, (error, info)=>{
+// Function to send email using nodemailer with promises
+function sendMail(mailOptions) {
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.log(error);
+        console.error('Error sending email:', error);
+        reject(error);
       } else {
         console.log('Email sent: ' + info.response);
+        resolve();
       }
     });
+  });
+}
+
     console.log(`Email sent: ${process.env.EMAIL_USER}`)
     res.redirect("/login");
   } catch (error) {
