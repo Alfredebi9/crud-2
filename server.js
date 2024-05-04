@@ -18,8 +18,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const transporter = nodemailer.createTransport({
   service:'gmail',
   auth: {
-    user: "alfredsalvadorfav@gmail.com",
-    pass: "kcmfvgkkdgxsrsxr"
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
   }
 });
 
@@ -64,7 +64,7 @@ app.post("/register", async (req, res) => {
     await newUser.save();
     // send verification email
     const mailOptions = {
-      from: "alfredsalvadorfav@gmail.com",
+      from: process.env.EMAIL_USER,
       to: email,
       subject: 'Email Verification',
       html: '<h1>Welcome to CRUD</h1> Click the link to verify your email <br> https://crud-2-vysm.vercel.app/verify/' + newUser._id
