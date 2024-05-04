@@ -20,11 +20,10 @@ const transporter = nodemailer.createTransport({
   port: 465, // Use port 465 for secure SSL connection
   secure: true, // true for 465, false for other ports
   auth: {
-    user: process.env.EMAIL_USER,
+    user: "alfredsalvadorfav@zohomail.com",
     pass: process.env.EMAIL_PASSWORD
   }
 });
-
 
 
 // Middleware
@@ -67,7 +66,7 @@ app.post("/register", async (req, res) => {
     await newUser.save();
     // send verification email
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: "alfredsalvadorfav@zohomail.com",
       to: email,
       subject: 'Email Verification',
       html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-auth-blush.vercel.app/verify/' + newUser._id
