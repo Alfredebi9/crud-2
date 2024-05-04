@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
   service:'gmail',
   auth: {
     user: "alfredsalvadorfav@gmail.com",
-    pass: process.env.EMAIL_PASSWORD
+    pass: "kcmfvgkkdgxsrsxr"
   }
 });
 
@@ -67,7 +67,7 @@ app.post("/register", async (req, res) => {
       from: "alfredsalvadorfav@gmail.com",
       to: email,
       subject: 'Email Verification',
-      text: 'Click the link to verify your email: https://crud-2-vysm.vercel.app/verify/' + newUser._id
+      html: '<h1>Welcome to CRUD</h1> Click the link to verify your email <br> https://crud-2-vysm.vercel.app/verify/' + newUser._id
     };
     transporter.sendMail(mailOptions, (error, info)=>{
       if (error) {
