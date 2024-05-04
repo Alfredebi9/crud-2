@@ -7,6 +7,7 @@ require("dotenv").config();
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
+const SendmailTransport = require("nodemailer/lib/sendmail-transport");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -73,13 +74,14 @@ app.post("/register", async (req, res) => {
       subject: 'Email Verification',
       html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-auth-blush.vercel.app/verify/' + newUser._id
     };
-    transporter.sendMail(mailOptions, (error, info)=>{
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    await sendMail(mailOptions);
+    // transporter.sendMail(mailOptions, (error, info)=>{
+    //   if (error) {
+    //     console.log(error);
+    //   } else {
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
     console.log(`Email sent: ${process.env.EMAIL_USER}`)
     res.redirect("/login");
   } catch (error) {
@@ -87,6 +89,23 @@ app.post("/register", async (req, res) => {
     res.status(500).send("Error registering user");
   }
 });
+
+
+
+
+// Function to send email using nodemailer with promises
+function sendMail(mailOptions) {
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+        resolve();
+      }
+    });
+  });
+}
 
 // Email verification
 app.get("/verify/:userId", async (req, res) => {
