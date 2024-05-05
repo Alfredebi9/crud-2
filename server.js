@@ -72,23 +72,20 @@ app.post("/register", async (req, res) => {
       subject: 'Email Verification',
       html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-auth-blush.vercel.app/verify/' + newUser._id
     };
-// Function to send email using nodemailer with promises
-function sendMail(mailOptions) {
-  return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error, info) => {
+    // Function to send email using nodemailer with promises
+    transporter.sendMail(mailOptions, (error, info)=>{
       if (error) {
-        console.error('Error sending email:', error);
-        reject(error);
+        console.error(error);
+        console.log(error);
+        return res.status(500).send("Error sending verification email");
       } else {
-        console.log('Email sent: ' + info.response);
-        resolve();
+        console.log("Verification email sent: " + info.response);
+        console.log(info.accepted);
+        console.log(info.rejected);
+        res.redirect("/login");
       }
-    });
-  });
-}
-
-    console.log(`Email sent: ${process.env.EMAIL_USER}`)
-    res.redirect("/login");
+     })
+    console.log(`Email sent: ${process.env.EMAIL_USER}`);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error registering user");
