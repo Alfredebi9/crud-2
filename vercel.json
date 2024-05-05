@@ -9,11 +9,5 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/server.js" }
-  ],
-  "env": {
-    "MONGODB_URI":"mongodb+srv://alfredsalvadorfav:bQ26icwXoOZuEiEm@cluster0.eijztjr.mongodb.net/CRUD?retryWrites=true&w=majority&appName=Cluster0",
-    "JWT_SECRET":"66b1bf8661a3912a6b1361ef0394094688238c76c67c92bc733496c5db5b0df1e3dec852435a103813a292a47cd95c00a2fb5df646034a222fde5fdd20770d12",
-    "EMAIL_USER":"alfredsalvadorfav@zohomail.com",
-    "EMAIL_PASSWORD":"calvaldorfavour"
-  }
+  ]
 }
