@@ -160,6 +160,82 @@ app.get("/logout", (req, res) => {
   res.redirect("/login");
 });
 
+
+
+// Forgot Password
+app.get("/forgot-password", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "forgot-password.html"));
+});
+
+// Handle forgotten password form submission
+app.post("/forgot-password", async (req, res) => {
+  try {
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).send("User not found");
+      }
+      
+      // Generate a password reset token and send it to the user's email
+      const resetToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+      const resetLink = `https://crud-2-beta.vercel.app/reset-password?token=${resetToken}`;
+      
+      const mailOptions = {
+          from: EMAIL_USER,
+          to: email,
+          subject: "Password Reset Request",
+          html: `Click the link below to reset your password: <a href="${resetLink}">${resetLink}</a>`
+      };
+      
+      transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+              console.error(error);
+              return res.status(500).send("Error sending password reset email");
+          } else {
+              console.log("Password reset email sent: " + info.response);
+              res.send("Password reset instructions sent to your email");
+          }
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Error processing password reset request");
+  }
+});
+
+// Serve forgot password page
+app.get("/reset-password", (req, res) => {
+  const token = req.query.token;
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+      if (err) {
+          return res.status(401).send("Invalid or expired token. Please try again.");
+      }
+      res.redirect(`/reset-password?token=${token}`); // Redirect to /reset-password with token
+  });
+});
+
+// Handle password reset form submission
+app.post("/reset-password", async (req, res) => {
+  try {
+      const { token, newPassword } = req.body;
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const user = await User.findById(decoded.userId);
+      if (!user) {
+          return res.status(404).send("User not found");
+      }
+      
+      // Update user's password with the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+      await user.save();
+      
+      res.send("Password reset successful. You can now login with your new password.");
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Error resetting password");
+  }
+});
+
+
 // Serve home page or login page based on authentication status
 app.get("/", (req, res) => {
   const token = req.cookies.token;
