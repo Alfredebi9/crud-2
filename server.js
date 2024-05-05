@@ -72,7 +72,7 @@ app.post("/register", async (req, res) => {
       from: EMAIL_USER,
       to: email,
       subject: `Email Confirmation - CRUD-2` ,
-      html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-2-omega.vercel.app/verify/' + newUser._id
+      html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-2-beta.vercel.app/verify/' + newUser._id
     };
     // Function to send email using nodemailer with promises
     transporter.sendMail(mailOptions, (error, info)=>{
