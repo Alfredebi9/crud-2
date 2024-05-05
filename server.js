@@ -209,7 +209,7 @@ app.get("/reset-password", (req, res) => {
       if (err) {
           return res.status(401).send("Invalid or expired token. Please try again.");
       }
-      res.redirect(`/reset-password?token=${token}`); // Redirect to /reset-password with token
+      res.sendFile(path.join(__dirname, "public", "reset-password.html"));
   });
 });
 
