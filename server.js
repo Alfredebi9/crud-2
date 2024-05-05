@@ -12,6 +12,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
+const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+const EMAIL_USER = process.env.EMAIL_USER;
 
 
 // Configure nodemailer transporter
@@ -21,8 +23,8 @@ const transporter = nodemailer.createTransport({
   port: 465, // Use port 465 for secure SSL connection
   secure: true, // true for 465, false for other ports
   auth: {
-    user: "alfredsalvadorfav@zohomail.com",
-    pass: process.env.EMAIL_PASSWORD
+    user: EMAIL_USER,
+    pass: EMAIL_PASSWORD
   }
 });
 
@@ -67,10 +69,10 @@ app.post("/register", async (req, res) => {
     await newUser.save();
     // send verification email
     const mailOptions = {
-      from: "alfredsalvadorfav@zohomail.com",
+      from: EMAIL_USER,
       to: email,
-      subject: 'Email Verification',
-      html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-auth-blush.vercel.app/verify/' + newUser._id
+      subject: `Email Confirmation - CRUD-2` ,
+      html: '<h1>Welcome to CRUD</h1> Click the link below to verify your email <br> https://crud-2-omega.vercel.app/verify/' + newUser._id
     };
     // Function to send email using nodemailer with promises
     transporter.sendMail(mailOptions, (error, info)=>{
