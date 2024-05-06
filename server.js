@@ -7,6 +7,10 @@ const transporter = require("./config/emailConfig");
 const authRoutes = require("./routes/authRoutes");
 const authenticateToken = require("./middleware/authMiddleware");
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,6 +18,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use("/", authRoutes);
+
 
 
 app.get("/protected", authenticateToken, (req, res) => {
